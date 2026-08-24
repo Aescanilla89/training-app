@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "PIN": "@pin"
+  },
+  "regions": ["mad1"],
+  "functions": {
+    "app/api/**": {
+      "maxDuration": 10
+    }
+  }
+}
