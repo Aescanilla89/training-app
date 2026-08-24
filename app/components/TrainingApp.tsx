@@ -39,69 +39,8 @@ function phaseOf(w: number) {
 }
 
 export default function TrainingApp({ onLogout }: { onLogout: () => void }) {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(weekOf(new Date()));
   const [view, setView] = useState('hoy');
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      const res = await fetch('/api/data');
-      if (res.ok) {
-        const { data: fetchedData } = await res.json();
-        setData(fetchedData || { weeks: {}, notes: [] });
-      }
-    } catch (error) {
-      console.error('Error cargando datos:', error);
-      setData({ weeks: {}, notes: [] });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const saveData = async (newData: any) => {
-    setSaving(true);
-    try {
-      await fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: newData }),
-      });
-      setData(newData);
-    } catch (error) {
-      console.error('Error guardando datos:', error);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const updateWeekSession = (week: number, day: string, field: string, value: any) => {
-    const newData = { ...data };
-    if (!newData.weeks[week]) {
-      newData.weeks[week] = { sessions: {}, tanita: null };
-    }
-    if (!newData.weeks[week].sessions[day]) {
-      newData.weeks[week].sessions[day] = {};
-    }
-    newData.weeks[week].sessions[day][field] = value;
-    saveData(newData);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando plan...</p>
-        </div>
-      </div>
-    );
-  }
 
   const today = dayStart(new Date());
   const daysToRace = Math.max(0, Math.round((PLAN_DATA.RACE.getTime() - today.getTime()) / 86400000));
@@ -142,12 +81,12 @@ export default function TrainingApp({ onLogout }: { onLogout: () => void }) {
       {/* Main content */}
       <main className="max-w-4xl mx-auto px-4 py-6 pb-24">
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-slate-700">
+        <div className="flex gap-2 mb-6 border-b border-slate-700 overflow-x-auto">
           {['hoy', 'semana', 'progreso', 'ajustes'].map((tab) => (
             <button
               key={tab}
               onClick={() => setView(tab)}
-              className={`px-4 py-2 text-sm font-medium transition border-b-2 ${
+              className={`px-4 py-2 text-sm font-medium transition border-b-2 whitespace-nowrap ${
                 view === tab
                   ? 'border-blue-500 text-blue-400'
                   : 'border-transparent text-slate-400 hover:text-slate-300'
@@ -169,14 +108,7 @@ export default function TrainingApp({ onLogout }: { onLogout: () => void }) {
                 Semana {weekOf(today)} de tu plan. {currentWeek > 43 ? '¡Plan completado!' : `${43 - currentWeek} semanas restantes.`}
               </p>
               <div className="bg-blue-900 bg-opacity-30 border border-blue-700 rounded p-4 text-sm text-slate-200">
-                <p>📝 Aquí verás hoy la sesión de entrenamiento, registros de hábitos y progreso de la semana.</p>
-              </div>
-            </div>
-
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-              <h3 className="text-lg font-bold mb-4">Sesión de hoy</h3>
-              <div className="text-slate-400">
-                <p>Los entrenamientos se mostrarán según el día de la semana.</p>
+                <p>📝 Sesión de entrenamiento de hoy</p>
               </div>
             </div>
           </div>
@@ -185,10 +117,10 @@ export default function TrainingApp({ onLogout }: { onLogout: () => void }) {
         {/* View: Semana */}
         {view === 'semana' && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 gap-2">
               <button
                 onClick={() => setCurrentWeek(Math.max(1, currentWeek - 1))}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded transition"
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded transition text-sm"
               >
                 ← Anterior
               </button>
@@ -198,14 +130,14 @@ export default function TrainingApp({ onLogout }: { onLogout: () => void }) {
               </div>
               <button
                 onClick={() => setCurrentWeek(Math.min(43, currentWeek + 1))}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded transition"
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded transition text-sm"
               >
                 Siguiente →
               </button>
             </div>
 
             <div className="bg-blue-900 bg-opacity-30 border border-blue-700 rounded p-4 text-sm">
-              <p>📋 Las sesiones de la semana se mostrarán aquí (Lunes, Martes, Viernes, Fin de semana)</p>
+              <p>📋 Entrenamientos de la semana</p>
             </div>
           </div>
         )}
@@ -215,7 +147,7 @@ export default function TrainingApp({ onLogout }: { onLogout: () => void }) {
           <div className="space-y-4">
             <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
               <h2 className="text-xl font-bold mb-4">Progreso general</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-700 rounded p-4">
                   <p className="text-xs text-slate-400 uppercase">Semana actual</p>
                   <p className="text-2xl font-bold text-blue-400">{currentWeek}/43</p>
@@ -224,20 +156,7 @@ export default function TrainingApp({ onLogout }: { onLogout: () => void }) {
                   <p className="text-xs text-slate-400 uppercase">Progreso</p>
                   <p className="text-2xl font-bold text-green-400">{Math.round((currentWeek / 43) * 100)}%</p>
                 </div>
-                <div className="bg-slate-700 rounded p-4">
-                  <p className="text-xs text-slate-400 uppercase">Falta</p>
-                  <p className="text-2xl font-bold text-orange-400">{43 - currentWeek}</p>
-                </div>
-                <div className="bg-slate-700 rounded p-4">
-                  <p className="text-xs text-slate-400 uppercase">Fase</p>
-                  <p className="text-lg font-bold">{phase.name}</p>
-                </div>
               </div>
-            </div>
-
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-              <h3 className="font-bold mb-2">📊 Gráficos de seguimiento</h3>
-              <p className="text-sm text-slate-400">Los gráficos de peso, composición corporal y cargas se mostrarán aquí cuando registres datos.</p>
             </div>
           </div>
         )}
@@ -246,34 +165,16 @@ export default function TrainingApp({ onLogout }: { onLogout: () => void }) {
         {view === 'ajustes' && (
           <div className="space-y-4">
             <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-              <h2 className="text-xl font-bold mb-4">⚙️ Ajustes y configuración</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">PIN actual</label>
-                  <p className="text-xs text-slate-400">Configurable desde Vercel (variable de entorno PIN)</p>
-                </div>
-                <div className="bg-amber-900 bg-opacity-30 border border-amber-700 rounded p-3 text-sm">
-                  💾 Los datos se guardan automáticamente y se sincronizan entre dispositivos
-                </div>
-              </div>
+              <h2 className="text-xl font-bold mb-4">⚙️ Configuración</h2>
+              <p className="text-sm text-slate-300">App de seguimiento de plan de entrenamiento</p>
             </div>
-
-            {saving && (
-              <div className="bg-blue-900 bg-opacity-30 border border-blue-700 rounded p-4 text-sm flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
-                Guardando cambios...
-              </div>
-            )}
           </div>
         )}
       </main>
 
-      {/* Bottom navigation indicator */}
+      {/* Bottom navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-slate-950 border-t border-slate-700 px-4 py-3">
-        <p className="text-xs text-center text-slate-500">
-          {saving && 'Sincronizando datos...'}
-          {!saving && 'Datos sincronizados'}
-        </p>
+        <p className="text-xs text-center text-slate-500">Datos sincronizados</p>
       </div>
     </div>
   );
