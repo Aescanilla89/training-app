@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training App</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+    body { background: #1e293b; color: white; font-family: system-ui, -apple-system, sans-serif; }
+    header { background: #0f172a; border-bottom: 1px solid #475569; padding: 1rem; }
+    main { max-width: 60rem; margin: 0 auto; padding: 1.5rem; }
+    .card { background: #334155; border-radius: 0.5rem; padding: 1.5rem; margin: 1rem 0; border: 1px solid #475569; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+    .stat-box { background: #475569; padding: 1rem; border-radius: 0.5rem; }
+    .stat-label { font-size: 0.75rem; color: #94a3b8; margin: 0 0 0.5rem 0; }
+    .stat-value { font-size: 1.875rem; font-weight: bold; margin: 0; color: #60a5fa; }
+    @media (max-width: 768px) {
+      body { font-size: 14px; }
+      main { padding: 1rem; }
+      .card { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="margin: 0 0 0.5rem 0; font-size: 1.875rem;">Mi App de Entrenamiento</h1>
+    <p style="color: #cbd5e1; margin: 0;">Semana 1 - Base</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2 style="margin: 0 0 1rem 0;">Hola 👋</h2>
+      <p style="margin: 0; color: #e2e8f0;">Bienvenido a tu app de seguimiento de entrenamientos</p>
+    </div>
+
+    <div class="grid">
+      <div class="stat-box">
+        <p class="stat-label">SEMANA ACTUAL</p>
+        <p class="stat-value">1/43</p>
+      </div>
+      <div class="stat-box">
+        <p class="stat-label">PROGRESO</p>
+        <p class="stat-value" style="color: #4ade80;">2%</p>
+      </div>
+      <div class="stat-box">
+        <p class="stat-label">DÍAS PARA CARRERA</p>
+        <p class="stat-value" style="color: #f59e0b;">270</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin: 0 0 1rem 0;">📱 Responsive</h3>
+      <p style="margin: 0; color: #e2e8f0;">Esta versión funciona en desktop y móvil sin problemas</p>
+    </div>
+  </main>
+</body>
+</html>
